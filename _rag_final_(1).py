@@ -18,7 +18,7 @@ Original file is located at
 
 import os
 
-os.environ["GROQ_API_KEY"] = "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"
+os.environ["GROQ_API_KEY"] = "paste api key here"
 
 BASE = "/content/wikipedia-rag-agent"
 
