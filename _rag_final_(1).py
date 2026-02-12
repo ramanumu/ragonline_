@@ -27,153 +27,153 @@ os.makedirs(f"{BASE}/src", exist_ok=True)
 
 print("Folders created!")
 
-# Commented out IPython magic to ensure Python compatibility.
-# %%writefile /content/wikipedia-rag-agent/src/load_wikipedia.py
-# import requests
-# 
-# def load_wikipedia_text(topic: str) -> str:
-#     url = "https://en.wikipedia.org/w/api.php"
-# 
-#     params = {
-#         "action": "query",
-#         "format": "json",
-#         "titles": topic,
-#         "prop": "extracts",
-#         "explaintext": True,
-#     }
-# 
-#     headers = {
-#         "User-Agent": "RAG-Colab/1.0"
-#     }
-# 
-#     response = requests.get(url, params=params, headers=headers)
-#     response.raise_for_status()
-# 
-#     data = response.json()
-#     pages = data["query"]["pages"]
-#     page = next(iter(pages.values()))
-# 
-#     if "extract" not in page:
-#         raise ValueError("No content found")
-# 
-#     return page["extract"]
-#
+Commented out IPython magic to ensure Python compatibility.
+%%writefile /content/wikipedia-rag-agent/src/load_wikipedia.py
+import requests
 
-# Commented out IPython magic to ensure Python compatibility.
-# %%writefile /content/wikipedia-rag-agent/src/chunking.py
-# from langchain_text_splitters import RecursiveCharacterTextSplitter
-# 
-# def chunk_text(text, chunk_size=800, overlap=100):
-#     splitter = RecursiveCharacterTextSplitter(
-#         chunk_size=chunk_size,
-#         chunk_overlap=overlap
-#     )
-#     return splitter.split_text(text)
-#
+def load_wikipedia_text(topic: str) -> str:
+    url = "https://en.wikipedia.org/w/api.php"
 
-# Commented out IPython magic to ensure Python compatibility.
-# %%writefile /content/wikipedia-rag-agent/src/embeddings.py
-# from langchain_community.embeddings import HuggingFaceEmbeddings
-# from langchain_community.vectorstores import FAISS
-# 
-# def create_vectorstore(chunks):
-#     embeddings = HuggingFaceEmbeddings(
-#         model_name="sentence-transformers/all-MiniLM-L6-v2"
-#     )
-#     return FAISS.from_texts(chunks, embeddings)
-#
+    params = {
+        "action": "query",
+        "format": "json",
+        "titles": topic,
+        "prop": "extracts",
+        "explaintext": True,
+    }
 
-# Commented out IPython magic to ensure Python compatibility.
-# %%writefile /content/wikipedia-rag-agent/src/retrieval.py
-# def retrieve_context(vectorstore, question, k=3):
-#     docs = vectorstore.similarity_search(question, k=k)
-#     return "\n\n".join(doc.page_content for doc in docs)
-#
+    headers = {
+        "User-Agent": "RAG-Colab/1.0"
+    }
 
-# Commented out IPython magic to ensure Python compatibility.
-# %%writefile /content/wikipedia-rag-agent/src/prompts.py
-# 
-# def build_rag_prompt(context, question):
-#     return f"""
-# You are a study assistant.
-# 
-# Use ONLY the context below to answer the question.
-# If the answer is not in the context, say you don't know.
-# 
-# Return ONLY valid JSON in this format:
-# 
-# {{
-#   "answer": "short answer (2–5 sentences)",
-#   "supporting_quotes": [
-#     "quote from context",
-#     "quote from context"
-#   ],
-#   "confidence": "low | medium | high",
-#   "missing_info": "what information was missing if any"
-# }}
-# 
-# Context:
-# {context}
-# 
-# Question:
-# {question}
-# """
-#
+    response = requests.get(url, params=params, headers=headers)
+    response.raise_for_status()
 
-# Commented out IPython magic to ensure Python compatibility.
-# %%writefile /content/wikipedia-rag-agent/src/router.py
-# def route_question(question, llm_call):
-#     router_prompt = f"""
-# You are deciding what to do next for a Wikipedia Q&A bot.
-# 
-# If the question is unclear or vague, return: CLARIFY
-# If the question is clear and specific, return: RETRIEVE
-# 
-# Examples:
-# "What is it?" → CLARIFY
-# "Tell me about it" → CLARIFY
-# "What is the atmosphere of Mars?" → RETRIEVE
-# "When was diabetes discovered?" → RETRIEVE
-# 
-# Question: {question}
-# 
-# Return ONLY one word:
-# RETRIEVE or CLARIFY
-# """
-# 
-#     decision = llm_call(router_prompt).strip().upper()
-# 
-#     if "CLARIFY" in decision:
-#         return "CLARIFY"
-#     return "RETRIEVE"
-#
+    data = response.json()
+    pages = data["query"]["pages"]
+    page = next(iter(pages.values()))
 
-# Commented out IPython magic to ensure Python compatibility.
-# %%writefile /content/wikipedia-rag-agent/src/rag_pipeline.py
-# 
-# from retrieval import retrieve_context
-# from prompts import build_rag_prompt
-# from router import route_question
-# 
-# 
-# def answer_question(vectorstore, question, llm_call):
-# 
-#     # Step 1: Decide what to do
-#     decision = route_question(question, llm_call)
-# 
-#     # Step 2: If unclear → ask clarification
-#     if decision == "CLARIFY":
-#         return "Can you clarify your question?"
-# 
-#     # Step 3: Otherwise retrieve context
-#     context = retrieve_context(vectorstore, question)
-# 
-#     # Step 4: Build prompt (Part-2 structured output)
-#     prompt = build_rag_prompt(context, question)
-# 
-#     # Step 5: Get answer from LLM
-#     return llm_call(prompt)
-#
+    if "extract" not in page:
+        raise ValueError("No content found")
+
+    return page["extract"]
+
+
+Commented out IPython magic to ensure Python compatibility.
+%%writefile /content/wikipedia-rag-agent/src/chunking.py
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+def chunk_text(text, chunk_size=800, overlap=100):
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=overlap
+    )
+    return splitter.split_text(text)
+
+
+Commented out IPython magic to ensure Python compatibility.
+%%writefile /content/wikipedia-rag-agent/src/embeddings.py
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import FAISS
+
+def create_vectorstore(chunks):
+    embeddings = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    )
+    return FAISS.from_texts(chunks, embeddings)
+
+
+Commented out IPython magic to ensure Python compatibility.
+%%writefile /content/wikipedia-rag-agent/src/retrieval.py
+def retrieve_context(vectorstore, question, k=3):
+    docs = vectorstore.similarity_search(question, k=k)
+    return "\n\n".join(doc.page_content for doc in docs)
+
+
+Commented out IPython magic to ensure Python compatibility.
+%%writefile /content/wikipedia-rag-agent/src/prompts.py
+
+def build_rag_prompt(context, question):
+    return f"""
+You are a study assistant.
+
+Use ONLY the context below to answer the question.
+If the answer is not in the context, say you don't know.
+
+Return ONLY valid JSON in this format:
+
+{{
+  "answer": "short answer (2–5 sentences)",
+  "supporting_quotes": [
+    "quote from context",
+    "quote from context"
+  ],
+  "confidence": "low | medium | high",
+  "missing_info": "what information was missing if any"
+}}
+
+Context:
+{context}
+
+Question:
+{question}
+"""
+
+
+Commented out IPython magic to ensure Python compatibility.
+%%writefile /content/wikipedia-rag-agent/src/router.py
+def route_question(question, llm_call):
+    router_prompt = f"""
+You are deciding what to do next for a Wikipedia Q&A bot.
+
+If the question is unclear or vague, return: CLARIFY
+If the question is clear and specific, return: RETRIEVE
+
+Examples:
+"What is it?" → CLARIFY
+"Tell me about it" → CLARIFY
+"What is the atmosphere of Mars?" → RETRIEVE
+"When was diabetes discovered?" → RETRIEVE
+
+Question: {question}
+
+Return ONLY one word:
+RETRIEVE or CLARIFY
+"""
+
+    decision = llm_call(router_prompt).strip().upper()
+
+    if "CLARIFY" in decision:
+        return "CLARIFY"
+    return "RETRIEVE"
+
+
+Commented out IPython magic to ensure Python compatibility.
+%%writefile /content/wikipedia-rag-agent/src/rag_pipeline.py
+
+from retrieval import retrieve_context
+from prompts import build_rag_prompt
+from router import route_question
+
+
+def answer_question(vectorstore, question, llm_call):
+
+    # Step 1: Decide what to do
+    decision = route_question(question, llm_call)
+
+    # Step 2: If unclear → ask clarification
+    if decision == "CLARIFY":
+        return "Can you clarify your question?"
+
+    # Step 3: Otherwise retrieve context
+    context = retrieve_context(vectorstore, question)
+
+    # Step 4: Build prompt (Part-2 structured output)
+    prompt = build_rag_prompt(context, question)
+
+    # Step 5: Get answer from LLM
+    return llm_call(prompt)
+
 
 import sys
 sys.path.append("/content/wikipedia-rag-agent/src")
